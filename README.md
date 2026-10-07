@@ -241,6 +241,59 @@ Env: `ARYA_CDP_PORT` `ARYA_FOLDER` `ARYA_MODEL_PATH` `ARYA_SESSION` `ARYA_FROM` 
 
 The harness is built so **Arya is one adapter**, not the whole product. You can point the same case engine at another Electron (or CDP) AI app, or keep Arya and only change fixtures/suites for your own Knowledge folder.
 
+### Non–Arya 900 projects (quick guide)
+
+For a product that is **not** Arya 900, keep the **core** (cases, oracles, reports) and replace how the harness talks to the app.
+
+1. **Add your own adapter** — copy the template and implement two methods:
+
+```text
+extensions/adapters/_template  →  packages/adapter-myapp
+```
+
+```js
+export function createMyAdapter() {
+  return {
+    name: "myapp",
+    version: "1.0.0",
+    async probeCapabilities(cfg) {
+      // e.g. { cdp, modelLoaded, knowledgeFolder, confirmUi }
+    },
+    async runCase(ctx, caseDef) {
+      // send prompt to YOUR app, wait, return TurnCapture:
+      // { lastModel, activityItems, routeBand?, deniedClick?, stopped?, ... }
+    }
+  };
+}
+```
+
+- If the app is Electron with `--remote-debugging-port=…`, reuse [`packages/driver-cdp`](packages/driver-cdp/src/index.mjs) (`connectCdp`, `clickFind`, …).
+- Change selectors/RPC to **your** UI — do not require Arya’s `textarea.input` / `llmRpc`.
+- For CI without the app, wrap [`driver-stub`](packages/driver-stub) like [`adapter-example-echo`](packages/adapter-example-echo).
+
+2. **Register it in the CLI** — in [`packages/cli/src/cli.mjs`](packages/cli/src/cli.mjs) → `pickAdapter()`:
+
+```js
+if (name === "myapp") return createMyAdapter();
+```
+
+3. **Write your suites** — new YAML under `suites/yaml/…`, register in [`suites/catalog.yaml`](suites/catalog.yaml). Prompts and oracle patterns must match **your** product language and Activity/tool logs.
+
+4. **Point at your test data (local only)**:
+
+```bash
+# PowerShell — ARYA_FOLDER is just the projectRoot env name (historical)
+$env:ARYA_FOLDER="D:\path\to\your\test-docs"
+node packages/cli/src/cli.mjs --project myapp --suite my-suite --preflight
+node packages/cli/src/cli.mjs --project myapp --suite my-suite
+```
+
+5. **Extend checks if wording differs** — add oracles in `packages/core/src/oracles.mjs` for your tool names / log lines. Assert **engine signals** (tool fired, file exists, deny clicked), not full LLM essays.
+
+**You do not need:** Guard install, GGUF models, or Arya-specific skills. Prefer **adapter + suites + oracles** over forking the report/chaos engine.
+
+Step-by-step detail also under **Path B** below and [docs/write-an-adapter.md](docs/write-an-adapter.md).
+
 ### What you usually customize
 
 | Layer | Keep | Replace / extend |
