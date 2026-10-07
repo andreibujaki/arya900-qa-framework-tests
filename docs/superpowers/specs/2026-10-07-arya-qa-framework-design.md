@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-07  
 **Status:** Approved for implementation  
-**Repo:** `arya-guard-cdp-tests`
+**Repo:** `arya900-qa-framework-tests` (Arya900 QA framework tests)
 
 ## Goals
 

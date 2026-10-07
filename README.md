@@ -1,6 +1,6 @@
-# arya-guard-cdp-tests (Arya QA Framework v2)
+# Arya900 QA framework tests
 
-Public, installable **CDP QA framework** for [Arya 900 Guard](https://github.com/andreibujaki/arya900) / Guard Lab — and a **generic core** you can repurpose for other Electron apps.
+Public, installable **CDP QA framework** for agent and AI-engine testing of [Arya 900 Guard](https://github.com/andreibujaki/arya900) / Guard Lab — and a **generic core** you can repurpose for other Electron apps.
 
 - **YAML + Gherkin** authoring (one `CaseDefinition` model); Playwright optional for TS specs
 - **Zero hard npm dependencies** (Node 20+ only); `@playwright/test` is optional
@@ -121,8 +121,8 @@ A pack is considered healthy when:
 ## Install
 
 ```bash
-git clone https://github.com/andreibujaki/arya-guard-cdp-tests.git
-cd arya-guard-cdp-tests
+git clone https://github.com/andreibujaki/arya900-qa-framework-tests.git
+cd arya900-qa-framework-tests
 npm install
 npm run check
 ```

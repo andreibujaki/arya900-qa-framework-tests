@@ -1,8 +1,8 @@
 {
-  "name": "arya-guard-cdp-tests",
+  "name": "arya900-qa-framework-tests",
   "version": "2.0.0",
   "private": true,
-  "description": "Repurposable CDP QA framework for Arya 900 Guard / Lab (YAML + Gherkin + Playwright-ready).",
+  "description": "Arya900 QA framework tests — agent and AI-engine CDP harness for Arya 900 Guard / Lab.",
   "type": "module",
   "license": "Apache-2.0",
   "engines": {
@@ -32,6 +32,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/andreibujaki/arya-guard-cdp-tests.git"
+    "url": "https://github.com/andreibujaki/arya900-qa-framework-tests.git"
   }
 }
