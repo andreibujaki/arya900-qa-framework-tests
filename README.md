@@ -237,6 +237,133 @@ Env: `ARYA_CDP_PORT` `ARYA_FOLDER` `ARYA_MODEL_PATH` `ARYA_SESSION` `ARYA_FROM` 
 | 1 | Setup / infra error |
 | 2 | Case failures |
 
+## Customize for other projects
+
+The harness is built so **Arya is one adapter**, not the whole product. You can point the same case engine at another Electron (or CDP) AI app, or keep Arya and only change fixtures/suites for your own Knowledge folder.
+
+### What you usually customize
+
+| Layer | Keep | Replace / extend |
+| --- | --- | --- |
+| **Core** (`packages/core`) | Case model, oracles, invariants, reports, chaos/goldens | Add new named oracles/invariants for your app’s Activity wording |
+| **Driver** | `driver-cdp` (generic) or `driver-stub` (CI) | Rarely needed unless your app is not CDP/Electron |
+| **Adapter** | — | New `packages/adapter-<yourapp>` (how to talk to *your* UI/RPC) |
+| **Fixtures** | Public sample pack as a template | Your own folder via `ARYA_FOLDER` / `projectRoot` (never commit secrets) |
+| **Suites** | smoke / catalog pattern | New YAML/Gherkin cases for *your* prompts and pass rules |
+| **CLI** | flags and reports | Register your adapter in `pickAdapter()` |
+
+### Path A — Same Arya Guard, your own Project files
+
+Use when the product is still Arya, but documents/prompts differ:
+
+1. Put documents in any local folder (or copy `fixtures/sample-project` and edit).
+2. Set folder + model against a running Guard with CDP:
+
+```bash
+# PowerShell
+$env:ARYA_CDP_PORT="9222"
+$env:ARYA_FOLDER="D:\path\to\your\Knowledge"
+$env:ARYA_MODEL_PATH="C:\path\to\model.Q4_K_M.gguf"
+npm run setup:folder
+npm run setup:model
+```
+
+3. Copy a suite YAML (e.g. `suites/yaml/prod.yaml` → `suites/yaml/my-project.yaml`).
+4. Change `prompt` strings and oracle `pattern`s to match **your** filenames/tokens.
+5. Register it in [`suites/catalog.yaml`](suites/catalog.yaml):
+
+```yaml
+- id: my-project
+  title: My Knowledge pack
+  tags: [custom]
+  files:
+    - suites/yaml/my-project.yaml
+```
+
+6. Run:
+
+```bash
+node packages/cli/src/cli.mjs --project arya --suite my-project
+```
+
+Optional: `config.local.json` with `projectRoot`, `modelPath`, `cdpPort` (gitignored).
+
+### Path B — Different Electron AI app (new adapter)
+
+Use when UI/RPC is not Arya:
+
+1. **Copy the template**
+
+```bash
+# from repo root
+cp -r extensions/adapters/_template packages/adapter-myapp
+# or on Windows: Copy-Item -Recurse extensions\adapters\_template packages\adapter-myapp
+```
+
+2. **Implement the adapter contract** in `packages/adapter-myapp/src/index.mjs`:
+
+```js
+export function createMyAdapter() {
+  return {
+    name: "myapp",
+    version: "1.0.0",
+    async probeCapabilities(cfg) {
+      // return { cdp, modelLoaded, knowledgeFolder, confirmUi, ... }
+    },
+    async runCase(ctx, caseDef) {
+      // drive one turn; return TurnCapture:
+      // { lastModel, activityItems, routeBand?, deniedClick?, stopped?, writeName?, fileExists? }
+    }
+  };
+}
+```
+
+3. **Reuse CDP** if the app exposes `--remote-debugging-port=…`:
+
+   - Import helpers from [`packages/driver-cdp/src/index.mjs`](packages/driver-cdp/src/index.mjs) (`connectCdp`, `clickFind`, …).
+   - Map your selectors (composer, Send, Allow/Deny, Activity list) — Arya’s are in `adapter-arya` as a reference, not a requirement.
+
+4. **Stub for CI** — start from [`packages/adapter-example-echo`](packages/adapter-example-echo) / `driver-stub` so suites run without your app installed.
+
+5. **Register the adapter** in [`packages/cli/src/cli.mjs`](packages/cli/src/cli.mjs) `pickAdapter()`:
+
+```js
+if (name === "myapp") return createMyAdapter();
+```
+
+6. **Add suites** that use capabilities your probe reports (`requires: [cdp, modelLoaded, …]`).
+
+7. **Run**
+
+```bash
+node packages/cli/src/cli.mjs --project myapp --suite my-project --preflight
+node packages/cli/src/cli.mjs --project myapp --suite my-project
+```
+
+More detail: [docs/write-an-adapter.md](docs/write-an-adapter.md).
+
+### Path C — New checks without a new app
+
+- **Oracles** — add a function to `packages/core/src/oracles.mjs`, then reference it in YAML: `expect: [{ oracle: myNewCheck }]`.
+- **Invariants** — add to `packages/core/src/invariants.mjs` (property-style rules, e.g. “if low route → never search”).
+- **Gherkin** — describe scenarios in `features/*.feature` and list the file in `catalog.yaml` (see `route-gate-bdd`).
+- **Goldens** — pin Activity fingerprints under `goldens/`; refresh with `--update-goldens`.
+- **Tags / severity** — filter with `--tags`, mark soft vs blocker, use `--strict` for quarantine.
+
+### Customization checklist
+
+1. App launches with CDP (or you use stub).  
+2. Adapter can `newChat` / send prompt / read reply + tool/activity log.  
+3. Fixture pack has only content you are allowed to publish (or stays local).  
+4. Suite prompts match product language (EN/RO/…).  
+5. Oracles assert **engine signals**, not fragile full LLM essays.  
+6. `npm run check` (or your stub suite) stays green in CI.  
+7. Live pack documented: port, folder env, model path.
+
+### What not to fork lightly
+
+Avoid rewriting `packages/core` report/engine unless you need a new result taxonomy. Prefer **adapter + suites + oracles**. That keeps upstream improvements (chaos, JUnit, resume) usable for every custom project.
+
 ## Design spec
 
 [docs/superpowers/specs/2026-10-07-arya-qa-framework-design.md](docs/superpowers/specs/2026-10-07-arya-qa-framework-design.md)
