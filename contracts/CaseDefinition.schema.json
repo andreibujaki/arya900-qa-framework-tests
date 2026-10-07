@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://arya-qa.local/schemas/CaseDefinition.schema.json",
+  "title": "CaseDefinition",
+  "type": "object",
+  "required": ["id"],
+  "properties": {
+    "id": { "type": "string" },
+    "title": { "type": "string" },
+    "prompt": { "type": "string" },
+    "kind": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "severity": { "enum": ["blocker", "soft"] },
+    "requires": { "type": "array", "items": { "type": "string" } },
+    "expect": { "type": "array", "items": { "type": "object" } },
+    "invariants": { "type": "array", "items": { "type": "string" } },
+    "chaos": { "type": "object" },
+    "golden": { "type": "object" },
+    "requirementId": { "type": "string" },
+    "risk": { "enum": ["high", "med", "low"] }
+  }
+}

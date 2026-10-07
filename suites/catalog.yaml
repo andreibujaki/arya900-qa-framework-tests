@@ -1,0 +1,35 @@
+suites:
+  - id: smoke
+    title: Stub smoke (CI)
+    tags: [smoke, stub]
+    files:
+      - suites/yaml/smoke.yaml
+
+  - id: echo
+    title: Example echo adapter
+    tags: [smoke, example]
+    files:
+      - suites/yaml/echo.yaml
+
+  - id: route-gate
+    title: Route-confidence R1–R4
+    tags: [route, lab]
+    files:
+      - suites/yaml/route-gate.yaml
+
+  - id: route-gate-bdd
+    title: Route-gate Gherkin sample
+    tags: [route, gherkin]
+    files:
+      - features/route-gate.feature
+
+  - id: prod
+    title: Production agent T1–T9
+    tags: [prod, agent]
+    files:
+      - suites/yaml/prod.yaml
+
+  - id: lab
+    title: Lab full pack
+    tags: [lab]
+    compose: [route-gate, prod]

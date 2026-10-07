@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://arya-qa.local/schemas/SuiteReport.schema.json",
+  "title": "SuiteReport",
+  "type": "object",
+  "required": ["schemaVersion", "runId", "results", "counts"],
+  "properties": {
+    "schemaVersion": { "type": "integer" },
+    "runId": { "type": "string" },
+    "counts": { "type": "object" },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "status"],
+        "properties": {
+          "id": { "type": "string" },
+          "status": {
+            "enum": ["pass", "fail", "soft_fail", "skip", "error", "quarantine"]
+          }
+        }
+      }
+    }
+  }
+}

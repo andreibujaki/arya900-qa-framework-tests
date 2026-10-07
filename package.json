@@ -1,0 +1,37 @@
+{
+  "name": "arya-guard-cdp-tests",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Repurposable CDP QA framework for Arya 900 Guard / Lab (YAML + Gherkin + Playwright-ready).",
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "arya-cdp-test": "./packages/cli/src/cli.mjs"
+  },
+  "scripts": {
+    "postinstall": "node scripts/check-install.mjs",
+    "hash-fixtures": "node scripts/hash-fixtures.mjs",
+    "probe": "node packages/cli/src/cli.mjs --probe",
+    "preflight": "node packages/cli/src/cli.mjs --preflight",
+    "setup:folder": "node packages/cli/src/cli.mjs --setup folder",
+    "setup:model": "node packages/cli/src/cli.mjs --setup model",
+    "test": "node packages/cli/src/cli.mjs --project stub --suite smoke",
+    "test:stub": "node packages/cli/src/cli.mjs --project stub --suite smoke",
+    "test:unit": "node --test packages/core/src/oracles.test.mjs packages/core/src/mini-yaml.test.mjs",
+    "test:prod": "node packages/cli/src/cli.mjs --project arya --suite prod",
+    "test:route": "node packages/cli/src/cli.mjs --project arya --suite route-gate",
+    "test:lab": "node packages/cli/src/cli.mjs --project arya --suite lab",
+    "test:echo": "node packages/cli/src/cli.mjs --project example-echo --suite echo",
+    "check": "node packages/cli/src/cli.mjs --list && node scripts/check-install.mjs && npm run test:unit && npm run test:stub && npm run test:echo"
+  },
+  "optionalDependencies": {
+    "@playwright/test": "^1.51.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andreibujaki/arya-guard-cdp-tests.git"
+  }
+}

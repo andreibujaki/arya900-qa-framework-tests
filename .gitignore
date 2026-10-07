@@ -1,0 +1,12 @@
+node_modules/
+.env
+config.local.json
+sessions/
+*.log
+.DS_Store
+Thumbs.db
+playwright-report/
+test-results/
+allure-results/
+packages/*/node_modules/
+

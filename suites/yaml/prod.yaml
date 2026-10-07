@@ -1,0 +1,94 @@
+cases:
+  - id: T1-fuzzy-filename
+    capture: t1_fuzzy_filename
+    prompt: "what does demo report contain"
+    tags: [prod]
+    requires: [cdp, modelLoaded, knowledgeFolder]
+    expect:
+      - oracle: activityMatches
+        pattern: "Skill|Agent|knowledge-read|Citește|read_text|INSTRUMENT"
+      - oracle: replyMatches
+        pattern: "DEMO-TOKEN-ALPHA|alpha report|sample office|demo report"
+
+  - id: T2-agent-compare
+    capture: t2_agent_compare
+    prompt: "compare skill-tests/copy-alpha.md with skill-tests/copy-beta.md using tools; read both"
+    tags: [prod]
+    requires: [cdp, modelLoaded, knowledgeFolder]
+    expect:
+      - oracle: activityMatches
+        pattern: "compare|Skill|Agent|Citește|read_text"
+      - oracle: replyMinLength
+        min: 80
+
+  - id: T3-search
+    capture: t3_search
+    prompt: "search DEMO-TOKEN-ALPHA in Project"
+    tags: [prod]
+    requires: [cdp, modelLoaded, knowledgeFolder]
+    timeoutMs: 300000
+    expect:
+      - oracle: replyMatches
+        pattern: "DEMO-TOKEN-ALPHA"
+    expectGroups:
+      anyOf:
+        - oracle: activityMatches
+          pattern: "search_knowledge|Caută|Skill knowledge"
+        - oracle: replyMatches
+          pattern: "DEMO-TOKEN-ALPHA"
+
+  - id: T4-csv
+    capture: t4_csv_analyze
+    prompt: "analyze skill-tests/copy-budget.csv show tables and numbers"
+    tags: [prod]
+    requires: [cdp, modelLoaded, knowledgeFolder]
+    expect:
+      - oracle: activityMatches
+        pattern: "csv|Citește|read_text|Skill|Laptop|1200|Mouse"
+      - oracle: replyMinLength
+        min: 40
+
+  - id: T5-text-doc
+    capture: t5_text_analyze
+    prompt: "analyze skill-tests/copy-proforma.txt summarize contents"
+    tags: [prod]
+    requires: [cdp, modelLoaded, knowledgeFolder]
+    expect:
+      - oracle: activityMatches
+        pattern: "Citește|read_text|Skill|INSTRUMENT"
+      - oracle: replyMinLength
+        min: 40
+
+  - id: T6-write-allow
+    kind: write-allow
+    tags: [prod, write]
+    requires: [cdp, modelLoaded, knowledgeFolder, confirmUi]
+    cleanup: deleteCreatedFiles
+    expect:
+      - oracle: activityMatches
+        pattern: "knowledge_write|Scrie|creat|wrote|Permite|Allow|ProdWrite"
+      - oracle: fileExists
+
+  - id: T7-write-deny
+    kind: write-deny
+    tags: [prod, write]
+    requires: [cdp, modelLoaded, knowledgeFolder, confirmUi]
+    expect:
+      - oracle: denyClicked
+      - oracle: fileAbsent
+    invariants:
+      - writeDenyImpliesFileAbsent
+
+  - id: T8-abort
+    kind: abort
+    tags: [prod]
+    requires: [cdp, modelLoaded]
+    expect:
+      - oracle: stopClicked
+
+  - id: T9-fixture-integrity
+    kind: hash-originals
+    tags: [prod]
+    requires: [knowledgeFolder]
+    expect:
+      - oracle: manifestIntact

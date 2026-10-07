@@ -1,0 +1,10 @@
+cases:
+  - id: E1-echo
+    title: Echo adapter wrap
+    prompt: "hello echo"
+    tags: [example]
+    requires: [stub]
+    expect:
+      - oracle: stubEchoOk
+      - oracle: replyMatches
+        pattern: "echo-adapter"

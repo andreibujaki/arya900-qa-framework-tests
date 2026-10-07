@@ -1,0 +1,7 @@
+{
+  "name": "@arya-qa/cli",
+  "version": "2.0.0",
+  "type": "module",
+  "main": "./src/cli.mjs",
+  "bin": { "arya-cdp-test": "./src/cli.mjs" }
+}

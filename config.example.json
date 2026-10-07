@@ -1,0 +1,14 @@
+{
+  "cdpPort": 9222,
+  "waitMs": 300000,
+  "sessionDir": "./sessions/latest",
+  "projectRoot": "./fixtures/sample-project",
+  "fixturePack": "sample",
+  "modelPath": "",
+  "contextSize": 4096,
+  "chaosProfile": "light",
+  "chaosBudget": 20,
+  "abortBudget": 5,
+  "retainSessions": 10,
+  "goldenScope": "tools+route"
+}

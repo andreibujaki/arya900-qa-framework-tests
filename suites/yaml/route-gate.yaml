@@ -1,0 +1,48 @@
+cases:
+  - id: R1-opt-out
+    capture: R1_opt_out_hodge
+    prompt: "do not search in documents, tell whats the Hodge Conjecture?"
+    tags: [route]
+    requires: [cdp, modelLoaded, knowledgeFolder]
+    severity: blocker
+    requirementId: REQ-ROUTE-001
+    risk: high
+    expect:
+      - oracle: noKnowledgeTools
+      - oracle: replyMinLength
+        min: 40
+    invariants:
+      - ifOptOutNoKnowledgeTools
+
+  - id: R2-general
+    capture: R2_general_fact
+    prompt: "what issue is with Hodge Conjecture ?"
+    tags: [route]
+    requires: [cdp, modelLoaded, knowledgeFolder]
+    expect:
+      - oracle: noKnowledgeSearch
+      - oracle: replyMinLength
+        min: 40
+    invariants:
+      - ifRouteLowNoSearch
+
+  - id: R3-inventory
+    capture: R3_inventory
+    prompt: "listează documentele"
+    tags: [route, inventory]
+    requires: [cdp, modelLoaded, knowledgeFolder]
+    expect:
+      - oracle: activityMatches
+        pattern: "inventory|listeaz|Skill knowledge-list|document"
+
+  - id: R4-mid
+    capture: R4_mid_clarify
+    prompt: "please analyze and summarize this situation"
+    tags: [route]
+    requires: [cdp, modelLoaded, knowledgeFolder]
+    expect:
+      - oracle: activityMatches
+        pattern: "Project documents|generally|route mid|from Project"
+      - oracle: noKnowledgeSearch
+    invariants:
+      - ifMidThenClarifyNoTools

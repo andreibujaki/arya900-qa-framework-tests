@@ -1,0 +1,46 @@
+cases:
+  - id: S1-opt-out
+    title: Opt-out general chat
+    prompt: "do not search in documents, tell whats the Hodge Conjecture?"
+    tags: [smoke, route]
+    requires: [stub]
+    severity: blocker
+    requirementId: REQ-ROUTE-001
+    risk: high
+    expect:
+      - oracle: noKnowledgeSearch
+      - oracle: replyMinLength
+        min: 40
+      - oracle: stubEchoOk
+    invariants:
+      - ifOptOutNoKnowledgeTools
+
+  - id: S2-inventory
+    title: List documents
+    prompt: "listează documentele"
+    tags: [smoke, inventory]
+    requires: [stub]
+    expect:
+      - oracle: activityMatches
+        pattern: "inventory|Listează|knowledge-list|document"
+      - oracle: stubEchoOk
+
+  - id: S3-mid-clarify
+    title: Mid band clarify
+    prompt: "please analyze and summarize this situation"
+    tags: [smoke, route]
+    requires: [stub]
+    expect:
+      - oracle: activityMatches
+        pattern: "route mid|Project documents|generally"
+      - oracle: noKnowledgeSearch
+    invariants:
+      - ifMidThenClarifyNoTools
+
+  - id: S4-manifest
+    title: Fixture integrity
+    kind: hash-originals
+    tags: [smoke]
+    requires: [stub]
+    expect:
+      - oracle: manifestIntact
